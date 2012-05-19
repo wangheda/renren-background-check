@@ -1,0 +1,1 @@
+Do background check for your friends. Find out who he/she care about, and who cares about he/she.
