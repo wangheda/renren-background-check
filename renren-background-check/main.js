@@ -46,6 +46,12 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		});
 		if (localStorage['globalFriendList_'+globalUserId.toString()]){
 			// 曾经有数据， 展示数据
+			globalUserHead = JSON.parse(localStorage['UserHead_'+globalUserId.toString()]);
+			globalFriendHead = JSON.parse(localStorage['globalFriendHead_'+globalUserId.toString()]);
+			globalFriendList = JSON.parse(localStorage['globalFriendList_'+globalUserId.toString()]);
+			globalFriendName = JSON.parse(localStorage['globalFriendName_'+globalUserId.toString()]);
+			globalWhoCareAboutTA = JSON.parse(localStorage['globalWhoCareAboutTA_'+globalUserId.toString()]);
+			globalWhoTACareAbout = JSON.parse(localStorage['globalWhoTACareAbout_'+globalUserId.toString()]);
 			$('label#status').html('现在展示的是缓存数据，如果想要刷新，请按“重新生成”键');
 			$('#div_status').css('display', 'block');
 			$('#div_result').css('display', 'block');
@@ -118,12 +124,12 @@ function getNewData(){
 					globalFriendHead = globalStatus[globalFriendList[i]].headurl;
 				}
 				globalUserHead = globalStatus[globalUserId].headurl;
-				localStorage['UserHead_'+globalUserId.toString()] = globalUserHead;
-				localStorage['globalFriendHead_'+globalUserId.toString()] = globalFriendHead;
-				localStorage['globalFriendList_'+globalUserId.toString()] = globalFriendList;
-				localStorage['globalFriendName_'+globalUserId.toString()] = globalFriendName;
-				localStorage['globalWhoCareAboutTA_'+globalUserId.toString()] = globalWhoCareAboutTA;
-				localStorage['globalWhoTACareAbout_'+globalUserId.toString()] = globalWhoTACareAbout;
+				localStorage['UserHead_'+globalUserId.toString()] = JSON.stringify(globalUserHead);
+				localStorage['globalFriendHead_'+globalUserId.toString()] = JSON.stringify(globalFriendHead);
+				localStorage['globalFriendList_'+globalUserId.toString()] = JSON.stringify(globalFriendList);
+				localStorage['globalFriendName_'+globalUserId.toString()] = JSON.stringify(globalFriendName);
+				localStorage['globalWhoCareAboutTA_'+globalUserId.toString()] = JSON.stringify(globalWhoCareAboutTA);
+				localStorage['globalWhoTACareAbout_'+globalUserId.toString()] = JSON.stringify(globalWhoTACareAbout);
 				// 分析完毕
 				update_status('分析完毕。');					
 				// 画图
@@ -259,8 +265,8 @@ function tryFriendStatusList(friendid, pageNo){
 		} else if (data.doingArray){
 			globalStatus[friendid] = data;
 		}
-		console.log(friendid);
-		console.log(data);
+		//console.log(friendid);
+		//console.log(data);
 		globalSignAFS[friendid] = true;
 		friendname = '';
 		if (data.name){
@@ -367,8 +373,8 @@ function tryGetComment_Web(params, index, time, iAFC){
 			status_name = globalStatus[params.owner].name;
 			status_id = params.doingId;
 			update_status('成功获取好友"'+status_name+'"状态id为'+status_id+'的状态回复。');
-			console.log(gotCount);
-			console.log(data);
+			//console.log(gotCount);
+			//console.log(data);
 			gotCount++;
 		}
 	}, 'json');
@@ -455,7 +461,7 @@ function getComment(owner_id, index, time, secret_key, access_token, iAFC){
 				globalStatus[owner_id].doingArray[index].replyList = data;
 				globalSignAFC[iAFC] = true;
 				update_status('成功获取好友"'+status_name+'"状态id为'+status_id+'的状态回复。');
-				console.log(gotCount);
+				//console.log(gotCount);
 				gotCount++;
 			}, 'json');
 		} else {
