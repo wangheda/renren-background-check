@@ -121,7 +121,7 @@ function getNewData(){
 				// 保存分析结果为localStorage
 				var globalFriendHead = new Array(globalFriendList.length);
 				for (var i=0; i<globalFriendList.length; i++){
-					globalFriendHead = globalStatus[globalFriendList[i]].headurl;
+					globalFriendHead[i] = globalStatus[globalFriendList[i]].headurl;
 				}
 				globalUserHead = globalStatus[globalUserId].headurl;
 				localStorage['UserHead_'+globalUserId.toString()] = JSON.stringify(globalUserHead);
