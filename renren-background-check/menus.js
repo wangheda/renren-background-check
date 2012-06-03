@@ -15,7 +15,7 @@ function genericOnClick(info, tab) {
 var property = {"title": "对TA进行背景调查", 
 "contexts":["link"], 
 "targetUrlPatterns":["http://www.renren.com/profile.do*"], 
-"documentUrlPatterns":["http://friend.renren.com/*"],
+"documentUrlPatterns":["http://*.renren.com/*"],
 "onclick": genericOnClick};
 
 

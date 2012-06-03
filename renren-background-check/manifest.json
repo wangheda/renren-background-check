@@ -8,6 +8,12 @@
         "128": "pic_128.png"
     },
     "background_page": "background.html",
-    "permissions": ["contextMenus", "webRequest", "http://*.renren.com/*", "unlimitedStorage"],
+	"content_scripts": [
+    {
+        "matches":["http://graph.renren.com/oauth/login_success.html*"],
+        "js":["oauth2/oauth2_inject.js"],
+        "run_at":"document_start"
+    }],
+    "permissions": ["tabs", "contextMenus", "webRequest", "http://*.renren.com/*", "https://*.renren.com/*", "unlimitedStorage"],
     "default_locale":"zh_CN"
 }
