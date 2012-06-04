@@ -24,63 +24,81 @@ function Draw_Datagram( globalUserHead,
 	var canvas = $("#canvas_result1")[0];
 	if (canvas.getContext) {
 	    var ctx = canvas.getContext('2d');
-	    var centerX = 500;
-	    var centerY = 350;
-	    var allowedMaxRadius = 350;
+	    var centerX = 320;
+	    var centerY = 320;
+	    var maxAllowedRadius = 280;
+	    var minAllowedRadius = 55;
 	    var length = globalWhoCareAboutTA.length;
 	    var maxValue = getMaximum(globalWhoCareAboutTA);
 	    var whoCareAboutTAArray = new Array();
         
-        // Parameters of the radius equation
-	    var maxSqure = Math.pow(maxValue, 2);
-	    var B = (5*maxSqure-240)/(maxValue-maxSqure);
-	    var A = -5-B;    
-	    
 	    // First pass the data to build the data object
 	    for (var i=0, j=0; i<length; i++) {
-	        if (globalWhoCareAboutTA[i] !== 0) {
+	        if (globalWhoCareAboutTA[i] > 0) {
 	            // Create a new object
 	            var object = new Object ();
 	            object['name'] = globalFriendName[i];
 	            object['headurl'] = globalFriendHead[i];
 	            object['score'] = globalWhoCareAboutTA[i];
 	            object['sex'] = 'male';
-	            object['radius'] = A*Math.pow(object.score, 2)+B*object.score+300;
-	                    
+	            object['radius'] = 0;
+	            object['theta'] = 0;
+	            object['blur'] = 'green';
+	            
 	            // Add the object into the array
 	            whoCareAboutTAArray[j] = object;
 	            j++;
 	        }
 	    }
 	    
-	    // Second pass the data object to calculate the theta
-	    var thetaUnit = Math.PI*2/whoCareAboutTAArray.length;
-	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
-	        var xFactor = Math.pow(-1, Math.floor(Math.random()*10));
-	        var delta = thetaUnit*xFactor*0.25;
-	        whoCareAboutTAArray[i].theta = thetaUnit*i;
-	    }
+	    // Sorting the array with score from highest to lowest
+	    whoCareAboutTAArray.sort(arraySorting);
 	    
-	    // Third pass the data object just created to make sure there is no eclipsing
+	    // Determining the threshold value and index
+	    var thresholdValue = 0;
+	    var thresholdIndex = 14;
 	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
-	        var baseScore = whoCareAboutTAArray[i].score;
-	        var baseTheta = whoCareAboutTAArray[i].theta;
-	        if (baseScore>0.8*maxValue) {
-	            for (var j=0; j<whoCareAboutTAArray.length; j++) {
-	                if (i===j || whoCareAboutTAArray[j].score < 0.8*maxValue) {
-	                    continue;
-	                }
-	                var theta = whoCareAboutTAArray[j].theta;
-	                var absTheta = Math.sqrt(Math.pow(baseTheta-theta, 2));
-	                if (absTheta === thetaUnit) {
-	                    whoCareAboutTAArray[i].theta -= -0.6*thetaUnit;
-	                }
-	            }
+	        if (whoCareAboutTAArray[i].score === 0) {
+	            thresholdIndex = (i-1>14)?14:(i-1);
+	            break;
+	        }
+	    }
+	    thresholdValue = whoCareAboutTAArray[thresholdIndex].score;
+	    
+	    // Deleting all the objects whose score is lower than the threshold value
+        whoCareAboutTAArray.splice(thresholdIndex+1, whoCareAboutTAArray.length-thresholdIndex-1);
+        
+	    // closeFriendNum: the number of the scores bigger than percentage*maxValue
+	    var minValue = whoCareAboutTAArray[whoCareAboutTAArray.length-1].score;
+	    var closeScoreMark = (1.0-(1.0-minValue/maxValue)*0.25)*maxValue;
+	    var closeFriendNum = 0;
+	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
+	        if (whoCareAboutTAArray[i].score > closeScoreMark) {
+	            closeFriendNum++;
 	        }
 	    }
 	    
+        // Parameters of the radius equation: radius = A*score+B
+        var A = (maxAllowedRadius-minAllowedRadius)/(thresholdValue-maxValue);
+        var B = maxAllowedRadius-A*thresholdValue;
+        
+        // Second pass the data objects to set the radius and theta.
+        for (var i=0; i<whoCareAboutTAArray.length; i++) {
+            var object = whoCareAboutTAArray[i];
+            var delta = Math.pow(-1, Math.floor(Math.random()*10))*Math.PI/20;
+            object.radius = A*object.score+B;
+            if (i<closeFriendNum) {
+                object.theta = Math.PI*2/closeFriendNum*i+delta;
+            }
+            else {
+                var unit = Math.PI*2/(thresholdIndex+1-closeFriendNum);
+                var index = i-closeFriendNum;
+                object.theta = index*unit+delta+Math.PI/9*5;
+            }    
+        }
+                	    
 	    // Draw the user in the center
-	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 32, '', 'center');
+	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 25, '', 'center', 'blue');
 	    
 	    // Draw others
 	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
@@ -89,8 +107,9 @@ function Draw_Datagram( globalUserHead,
 	        var y = centerY+Math.sin(whoCareAboutTAArray[i].theta)*whoCareAboutTAArray[i].radius;
 	        var sex = whoCareAboutTAArray[i].sex;
 	        var name = whoCareAboutTAArray[i].name;
-	        DrawRenRenUser(ctx, headurl, x, y, 24, name, sex);
-	        DrawLine(ctx, x, y, centerX, centerY, sex);
+	        var blur = whoCareAboutTAArray[i].blur;
+	        DrawRenRenUser(ctx, headurl, x, y, 20, name, sex, blur);
+	        DrawLine(ctx, x, y, centerX, centerY, sex, blur);
 	    }
 	}
 }
@@ -116,25 +135,22 @@ function getMaximum(array) {
     return max;
 };
 
-function DrawLine(ctx, x, y, centerX, centerY, sex) {
-    ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.lineTo(x, y);
-    ctx.lineWidth = 0.5;
-    if (sex === 'male') {
-        ctx.strokeStyle = 'blue';   
-    }
-    else {
-        ctx.strokeStyle = 'pink';
-    }
-    ctx.stroke();
-};
 
-function DrawRenRenUser(context, headurl, x, y, radius, name, sex) {
+
+// context: the context of the canvas, 2d.
+// headurl: the url of the renren user head image.
+// x,y: the coordinates of the image circle center.
+// radius: the radius of the image circle.
+// name: the name of the renren user.
+// sex: the sex of the renren user.
+// blur: the blur effect color name.
+function DrawRenRenUser(context, headurl, x, y, radius, name, sex, blur) {
     var img = document.createElement('img');
-    var lineColor = (sex==='male')?'blue':'pink';
-    img.src = String(headurl);
+    img.src = headurl;
     img.onload = function() {
+        // Draw blur effect
+        DrawBlurEffect(context, x, y, radius, blur);
+        
         // Set the clipping region
         context.save();
         context.beginPath();
@@ -149,18 +165,58 @@ function DrawRenRenUser(context, headurl, x, y, radius, name, sex) {
         context.restore();
         context.beginPath();
         context.arc(x, y, radius, 0, 2*Math.PI, false);
-        context.lineWidth = 3;
-        context.strokeStyle = (sex==='center')?'black':lineColor;
+        context.lineWidth = 1.5;
+        context.strokeStyle = blur;
         context.stroke();
     };
     
     // Draw the name of the renren user and mark based on sex
+    DrawSexMark(context, x, y, radius, name, sex, blur);  
+};
+
+// Currently support blue, pink, red, green, yellow, orange, purple effects.
+function DrawBlurEffect(context, x, y, radius, blurName) {
+    var blur = context.createRadialGradient(x, y, 0, x, y, 1.5*radius);
+    
+    if (blurName === 'blue') {
+        blur.addColorStop(0, 'rgba(0,0,255,1)');
+        blur.addColorStop(1, 'rgba(0,0,228,0)');
+    } else if (blurName === 'pink') {
+        blur.addColorStop(0, 'rgba(255,20,147,1)');
+        blur.addColorStop(1, 'rgba(255,105,180,0)');
+    } else if (blurName === 'red') {
+        blur.addColorStop(0, 'rgba(255,0,0,1)');
+        blur.addColorStop(1, 'rgba(228,0,0,0)');
+    } else if (blurName === 'green') {
+        blur.addColorStop(0, 'rgba(0,255,0,1)');
+        blur.addColorStop(1, 'rgba(0,228,0,0)');
+    } else if (blurName === 'yellow') {
+        blur.addColorStop(0, 'rgba(255,215,0,1)');
+        blur.addColorStop(1, 'rgba(255,255,0,0)');
+    } else if (blurName === 'orange') {
+        blur.addColorStop(0, 'rgba(255,165,0,1)');
+        blur.addColorStop(1, 'rgba(255,140,0,0)');
+    } else if (blurName === 'purple') {
+        blur.addColorStop(0, 'rgba(138,43,226,1)');
+        blur.addColorStop(1, 'rgba(160,32,240,0)');
+    } else {
+        console.log('Unsupported blur effect color.');
+        return;
+    }
+    
+    context.arc(x, y, 1.5*radius, 0, Math.PI*2, false);
+    context.fillStyle = blur;
+    context.fill();
+};
+
+function DrawSexMark(context, x, y, radius, name, sex, lineColor) {
+    context.lineCap = 'round';
+    context.lineWidth = 2;
+    
     if (sex === 'male') {
         context.beginPath();
         context.moveTo(x, y-radius);
         context.lineTo(x, y-radius*1.6);
-        context.lineCap = 'round';
-        context.lineWidth = 3;
         context.strokeStyle = lineColor;
         context.stroke();
         
@@ -169,22 +225,19 @@ function DrawRenRenUser(context, headurl, x, y, radius, name, sex) {
         context.lineTo(x, y-radius*1.6);
         context.lineTo(x+radius*0.3, y-radius*1.3);
         context.lineJoin = 'miter';
-        context.lineWidth = 3;
         context.strokeStyle = lineColor;
         context.stroke();
         
         context.font = '8pt Arial';
         context.textAlign = 'center';
         context.fillType = 'black';
-        context.fillText(String(name), x, y+radius+12);
+        context.fillText(String(name), x, y+radius+16);
     }
     else if (sex === 'female')
     {
         context.beginPath();
         context.moveTo(x, y+radius);
         context.lineTo(x, y+radius*1.6);
-        context.lineCap = 'round';
-        context.lineWidth = 3;
         context.strokeStyle = lineColor;
         context.stroke();
         
@@ -192,13 +245,21 @@ function DrawRenRenUser(context, headurl, x, y, radius, name, sex) {
         context.moveTo(x-radius*0.3, y+radius*1.3);
         context.lineTo(x+radius*0.3, y+radius*1.3);
         context.lineCap = 'round';
-        context.lineWidth = 3;
         context.strokeStyle = lineColor;
         context.stroke();
         
         context.font = '8pt Arial';
         context.textAlign = 'center';
-        context.fillType = 'black';
-        context.fillText(String(name), x, y-radius-12);   
+        context.fillType = 'black';           
+        context.fillText(String(name), x, y-radius-16);   
     }
+};
+
+function DrawLine(ctx, x, y, centerX, centerY, sex, color) {
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(x, y);
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = color;   
+    ctx.stroke();
 };
