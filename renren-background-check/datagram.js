@@ -27,7 +27,7 @@ function Draw_Datagram( globalUserHead,
 	    var centerX = 320;
 	    var centerY = 320;
 	    var maxAllowedRadius = 280;
-	    var minAllowedRadius = 55;
+	    var minAllowedRadius = 70;
 	    var length = globalWhoCareAboutTA.length;
 	    var maxValue = getMaximum(globalWhoCareAboutTA);
 	    var whoCareAboutTAArray = new Array();
@@ -43,7 +43,13 @@ function Draw_Datagram( globalUserHead,
 	            object['sex'] = 'male';
 	            object['radius'] = 0;
 	            object['theta'] = 0;
-	            object['blur'] = 'green';
+	            
+	            var blurIndex = Math.floor(Math.random()*3);
+	            if (object.sex === 'male') {
+	                object['blur'] = globalBlurEffectNames[blurIndex];
+	            } else {
+	                object['blur'] = globalBlurEffectNames[blurIndex+3];
+	            }
 	            
 	            // Add the object into the array
 	            whoCareAboutTAArray[j] = object;
@@ -82,10 +88,10 @@ function Draw_Datagram( globalUserHead,
         var A = (maxAllowedRadius-minAllowedRadius)/(thresholdValue-maxValue);
         var B = maxAllowedRadius-A*thresholdValue;
         
-        // Second pass the data objects to set the radius and theta.
+        // Fourth pass the data objects to set the radius and theta.
         for (var i=0; i<whoCareAboutTAArray.length; i++) {
             var object = whoCareAboutTAArray[i];
-            var delta = Math.pow(-1, Math.floor(Math.random()*10))*Math.PI/20;
+            var delta = Math.pow(-1, Math.floor(Math.random()*10))*Math.PI/40;
             object.radius = A*object.score+B;
             if (i<closeFriendNum) {
                 object.theta = Math.PI*2/closeFriendNum*i+delta;
@@ -93,12 +99,12 @@ function Draw_Datagram( globalUserHead,
             else {
                 var unit = Math.PI*2/(thresholdIndex+1-closeFriendNum);
                 var index = i-closeFriendNum;
-                object.theta = index*unit+delta+Math.PI/9*5;
+                object.theta = index*unit+Math.PI/9*5;
             }    
         }
                 	    
-	    // Draw the user in the center
-	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 25, '', 'center', 'blue');
+	    // Draw the user in the center: globalUserName required!
+	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 36, '', 'center', 'none');
 	    
 	    // Draw others
 	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
@@ -108,7 +114,7 @@ function Draw_Datagram( globalUserHead,
 	        var sex = whoCareAboutTAArray[i].sex;
 	        var name = whoCareAboutTAArray[i].name;
 	        var blur = whoCareAboutTAArray[i].blur;
-	        DrawRenRenUser(ctx, headurl, x, y, 20, name, sex, blur);
+	        DrawRenRenUser(ctx, headurl, x, y, 24, name, sex, blur);
 	        DrawLine(ctx, x, y, centerX, centerY, sex, blur);
 	    }
 	}
@@ -170,89 +176,47 @@ function DrawRenRenUser(context, headurl, x, y, radius, name, sex, blur) {
         context.stroke();
     };
     
-    // Draw the name of the renren user and mark based on sex
-    DrawSexMark(context, x, y, radius, name, sex, blur);  
+    // Draw the name of the renren user
+    context.font = '8pt Arial';
+    context.textAlign = 'center';
+    context.fillType = 'black';           
+    context.fillText(name, x, y+1.7*radius);  
 };
 
-// Currently support blue, pink, red, green, yellow, orange, purple effects.
+var globalBlurEffectNames = [
+    'blue', 'cyan', 'turquoise',
+    'yellow', 'orange', 'pink'
+];
+
+// Currently support blue, cyan, turquoise, yellow, orange, pink effects.
 function DrawBlurEffect(context, x, y, radius, blurName) {
     var blur = context.createRadialGradient(x, y, 0, x, y, 1.5*radius);
     
     if (blurName === 'blue') {
         blur.addColorStop(0, 'rgba(0,0,255,1)');
-        blur.addColorStop(1, 'rgba(0,0,228,0)');
-    } else if (blurName === 'pink') {
-        blur.addColorStop(0, 'rgba(255,20,147,1)');
-        blur.addColorStop(1, 'rgba(255,105,180,0)');
-    } else if (blurName === 'red') {
-        blur.addColorStop(0, 'rgba(255,0,0,1)');
-        blur.addColorStop(1, 'rgba(228,0,0,0)');
-    } else if (blurName === 'green') {
-        blur.addColorStop(0, 'rgba(0,255,0,1)');
-        blur.addColorStop(1, 'rgba(0,228,0,0)');
+        blur.addColorStop(1, 'rgba(0,0,225,0)');
+    } else if (blurName === 'cyan') {
+        blur.addColorStop(0, 'rgba(0,255,255,1)');
+        blur.addColorStop(1, 'rgba(0,225,225,0)');
+    } else if (blurName === 'turquoise') {
+        blur.addColorStop(0, 'rgba(0,206,209,1)');
+        blur.addColorStop(1, 'rgba(72,209,204,0)');
     } else if (blurName === 'yellow') {
         blur.addColorStop(0, 'rgba(255,215,0,1)');
         blur.addColorStop(1, 'rgba(255,255,0,0)');
     } else if (blurName === 'orange') {
         blur.addColorStop(0, 'rgba(255,165,0,1)');
         blur.addColorStop(1, 'rgba(255,140,0,0)');
-    } else if (blurName === 'purple') {
-        blur.addColorStop(0, 'rgba(138,43,226,1)');
-        blur.addColorStop(1, 'rgba(160,32,240,0)');
-    } else {
-        console.log('Unsupported blur effect color.');
+    } else if (blurName === 'pink') {
+        blur.addColorStop(0, 'rgba(255,105,180,1)');
+        blur.addColorStop(1, 'rgba(255,20,147,0)');
+    } else if (blurName === 'none') {
         return;
-    }
+    } 
     
     context.arc(x, y, 1.5*radius, 0, Math.PI*2, false);
     context.fillStyle = blur;
     context.fill();
-};
-
-function DrawSexMark(context, x, y, radius, name, sex, lineColor) {
-    context.lineCap = 'round';
-    context.lineWidth = 2;
-    
-    if (sex === 'male') {
-        context.beginPath();
-        context.moveTo(x, y-radius);
-        context.lineTo(x, y-radius*1.6);
-        context.strokeStyle = lineColor;
-        context.stroke();
-        
-        context.beginPath();
-        context.moveTo(x-radius*0.3, y-radius*1.3);
-        context.lineTo(x, y-radius*1.6);
-        context.lineTo(x+radius*0.3, y-radius*1.3);
-        context.lineJoin = 'miter';
-        context.strokeStyle = lineColor;
-        context.stroke();
-        
-        context.font = '8pt Arial';
-        context.textAlign = 'center';
-        context.fillType = 'black';
-        context.fillText(String(name), x, y+radius+16);
-    }
-    else if (sex === 'female')
-    {
-        context.beginPath();
-        context.moveTo(x, y+radius);
-        context.lineTo(x, y+radius*1.6);
-        context.strokeStyle = lineColor;
-        context.stroke();
-        
-        context.beginPath();
-        context.moveTo(x-radius*0.3, y+radius*1.3);
-        context.lineTo(x+radius*0.3, y+radius*1.3);
-        context.lineCap = 'round';
-        context.strokeStyle = lineColor;
-        context.stroke();
-        
-        context.font = '8pt Arial';
-        context.textAlign = 'center';
-        context.fillType = 'black';           
-        context.fillText(String(name), x, y-radius-16);   
-    }
 };
 
 function DrawLine(ctx, x, y, centerX, centerY, sex, color) {
