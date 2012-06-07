@@ -28,7 +28,8 @@ function Draw_Datagram(  globalUserHead,
 					globalFriendName,
 					globalFriendSex, 
 					globalWhoCareAboutTA,
-					"#canvas_result1");
+					"#canvas_result1",
+					"谁关注TA");
 	Draw_Subgram(  globalUserHead, 
 					globalUserName,
 					globalFriendHead,  
@@ -36,7 +37,8 @@ function Draw_Datagram(  globalUserHead,
 					globalFriendName,
 					globalFriendSex, 
 					globalWhoTACareAbout,
-					"#canvas_result2");
+					"#canvas_result2",
+					"TA关注谁？");
 }
 
 function Draw_Subgram(globalUserHead, 
@@ -46,7 +48,8 @@ function Draw_Subgram(globalUserHead,
 				globalFriendName,
 				globalFriendSex, 
 				CaringList,
-				choose_exp) {
+				choose_exp,
+				title) {
 	// Show who cares about TA
 	var canvas = $(choose_exp)[0];
 	canvas.width = 640;
@@ -60,9 +63,16 @@ function Draw_Subgram(globalUserHead,
 	    var length = CaringList.length;
 	    var maxValue = getMaximum(CaringList);
 	    var whoCareAboutTAArray = new Array();
-		
+
+		// Draw Background
 		ctx.fillStyle="#FFFFFF";
 		ctx.fillRect(0,0,640,640);
+	    
+	    // Draw the title on the left
+	    context.font = '36pt Arial';
+        context.textAlign = 'left';
+        context.fillType = 'blue';           
+        context.fillText(title, 35, 100); 
         
 	    // First pass the data to build the data object
 	    for (var i=0, j=0; i<length; i++) {
