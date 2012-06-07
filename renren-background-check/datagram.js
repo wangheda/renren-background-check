@@ -69,11 +69,12 @@ function Draw_Subgram(globalUserHead,
 		ctx.fillRect(0,0,640,640);
 	    
 	    // Draw the title on the left
-	    context.font = '36pt Arial';
-        context.textAlign = 'left';
-        context.fillType = 'blue';           
-        context.fillText(title, 35, 100); 
-        
+	    ctx.font = '36pt Arial';
+        ctx.textAlign = 'left';
+        ctx.fillType = 'blue';    
+        ctx.fillStyle="#000000";       
+        ctx.fillText(title, 15, 56); 
+		        
 	    // First pass the data to build the data object
 	    for (var i=0, j=0; i<length; i++) {
 	        if (globalWhoCareAboutTA[i] > 0) {
