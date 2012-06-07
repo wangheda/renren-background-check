@@ -1,8 +1,10 @@
 var globalFriendList = new Array();
 var globalFriendName = new Array();
 var globalFriendHead = new Array();
+var globalFriendName = new Array();
 var globalUserHead = '';
 var globalUserId = 0;
+var globalUserName = 0;
 var globalSignGFL = new Array(1);// get friends list
 var globalSignAFS = new Array(1);//all friend's status
 var globalSignAFC = new Array(); // all friend's status's comment
@@ -47,9 +49,11 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		if (localStorage['globalFriendList_'+globalUserId.toString()]){
 			// 曾经有数据， 展示数据
 			globalUserHead = JSON.parse(localStorage['UserHead_'+globalUserId.toString()]);
+			globalUserName = JSON.parse(localStorage['UserName_'+globalUserId.toString()]);
 			globalFriendHead = JSON.parse(localStorage['globalFriendHead_'+globalUserId.toString()]);
 			globalFriendList = JSON.parse(localStorage['globalFriendList_'+globalUserId.toString()]);
 			globalFriendName = JSON.parse(localStorage['globalFriendName_'+globalUserId.toString()]);
+			globalFriendSex = JSON.parse(localStorage['globalFriendNaSex_'+globalUserId.toString()]);
 			globalWhoCareAboutTA = JSON.parse(localStorage['globalWhoCareAboutTA_'+globalUserId.toString()]);
 			globalWhoTACareAbout = JSON.parse(localStorage['globalWhoTACareAbout_'+globalUserId.toString()]);
 			$('label#status').html('现在展示的是缓存数据，如果想要刷新，请按“重新生成”键');
@@ -125,13 +129,17 @@ function getNewData(){
 						globalFriendHead[i] = globalStatus[globalFriendList[i]].headurl;
 					}
 				}
+				globalUserName = globalStatus[globalUserId].name;
 				globalUserHead = globalStatus[globalUserId].headurl;
 				localStorage['UserHead_'+globalUserId.toString()] = JSON.stringify(globalUserHead);
+				localStorage['UserName_'+globalUserId.toString()] = JSON.stringify(globalUserName);
 				localStorage['globalFriendHead_'+globalUserId.toString()] = JSON.stringify(globalFriendHead);
 				localStorage['globalFriendList_'+globalUserId.toString()] = JSON.stringify(globalFriendList);
 				localStorage['globalFriendName_'+globalUserId.toString()] = JSON.stringify(globalFriendName);
 				localStorage['globalWhoCareAboutTA_'+globalUserId.toString()] = JSON.stringify(globalWhoCareAboutTA);
 				localStorage['globalWhoTACareAbout_'+globalUserId.toString()] = JSON.stringify(globalWhoTACareAbout);
+				
+				localStorage['globalFriendSex_'+globalUserId.toString()] = JSON.stringify(globalFriendSex);
 				// 分析完毕
 				update_status('分析完毕。');					
 				// 画图
@@ -139,6 +147,55 @@ function getNewData(){
 			}
 		}, 2*1000);
 	}
+}
+
+function getFriendSex(uids){
+	var secret_key = "630008bbe5ae4d6fbf3266dfbacd648e";
+	var renren = new OAuth2('renren', {
+		client_id:'de7d400db676479b9847a0cdecefac2d',
+		client_secret:secret_key,
+		api_scope:'read_user_status,read_user_comment,read_user_request'    
+	});
+	
+	renren.authorize(function() {
+		var status_id  = globalStatus[owner_id].doingArray[index].id;
+		var status_name = globalStatus[owner_id].name;
+		update_status('开始获取好友"'+status_name+'"状态id为'+status_id+'的状态回复...');
+		var params = {}
+		params['access_token'] = access_token;
+		params['call_id'] = new Date().valueOf();
+		params['method'] = 'users.getInfo'
+		params['uids'] = uids.join(',');
+		params['fields'] = "uid,sex";
+		params['v'] = "1.0";
+		params['format'] = "json";
+		
+		//var keyList = ['access_token', 'call_id', 'method', 'v', 'format', 'uid'];
+		var param_array = [];			
+		
+		//遍历表单中调用接口需要的参数，并拼装成"key=value"形式压入数组
+		//for (var i=0; i<keyList.length; i++){
+		//	param_array.push(keyList[i] + "=" + params[keyList[i]]);
+		//}
+		for (var key in params){
+			param_array.push(key + "=" + params[key]);
+		}
+		var sig = generateSigFromArray(param_array, secret_key);
+		
+		params['sig'] = sig;
+		
+		$.post('http://api.renren.com/restserver.do', params, function(data){
+			globalFriendSex = {};
+			for (var i=0; i<data.length; i++){
+				if (data[i]['sex']){
+					globalFriendSex[data[i]['uid']] = 'male';
+				} else {
+					globalFriendSex[data[i]['uid']] = 'female';
+				}
+			}
+			update_status('成功获取好友性别列表。');
+		}, 'json');
+	});
 }
 
 // get Friend List, if fully loaded, globalSignGFL should be [true, true, ...]
