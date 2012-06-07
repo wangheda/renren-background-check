@@ -1,10 +1,12 @@
 // JavaScript Document
-function Draw_Datagram( globalUserHead, 
-						globalFriendHead,  
-						globalFriendList, 
-						globalFriendName,
-						globalWhoCareAboutTA, 
-						globalWhoTACareAbout) {
+function Draw_Datagram(  globalUserHead, 
+					globalUserName,
+					globalFriendHead,  
+					globalFriendList, 
+					globalFriendName,
+					globalFriendSex, 
+					globalWhoCareAboutTA, 
+					globalWhoTACareAbout) {
 	// Your have access to:
 	// $('#canvas_result1'), 
 	// $('#canvas_result2'),
@@ -19,17 +21,44 @@ function Draw_Datagram( globalUserHead,
 	// globalFriendName 用户好友的名字列表
 	// globalWhoCareAboutTA 用户好友中谁关心TA的分数列表
 	// globalWhoTACareAbout 用户好友中TA关心谁的分数列表
-	
+	Draw_Subgram(  globalUserHead, 
+					globalUserName,
+					globalFriendHead,  
+					globalFriendList, 
+					globalFriendName,
+					globalFriendSex, 
+					globalWhoCareAboutTA,
+					"#canvas_result1");
+	Draw_Subgram(  globalUserHead, 
+					globalUserName,
+					globalFriendHead,  
+					globalFriendList, 
+					globalFriendName,
+					globalFriendSex, 
+					globalWhoTACareAbout,
+					"#canvas_result2");
+}
+
+function Draw_Subgram(globalUserHead, 
+				globalUserName,
+				globalFriendHead,  
+				globalFriendList, 
+				globalFriendName,
+				globalFriendSex, 
+				CaringList,
+				choose_exp) {
 	// Show who cares about TA
-	var canvas = $("#canvas_result1")[0];
+	var canvas = $(choose_exp)[0];
+	canvas.width = 640;
+	canvas.height = 640;
 	if (canvas.getContext) {
 	    var ctx = canvas.getContext('2d');
 	    var centerX = 320;
 	    var centerY = 320;
 	    var maxAllowedRadius = 280;
 	    var minAllowedRadius = 70;
-	    var length = globalWhoCareAboutTA.length;
-	    var maxValue = getMaximum(globalWhoCareAboutTA);
+	    var length = CaringList.length;
+	    var maxValue = getMaximum(CaringList);
 	    var whoCareAboutTAArray = new Array();
         
 	    // First pass the data to build the data object
@@ -39,8 +68,8 @@ function Draw_Datagram( globalUserHead,
 	            var object = new Object ();
 	            object['name'] = globalFriendName[i];
 	            object['headurl'] = globalFriendHead[i];
-	            object['score'] = globalWhoCareAboutTA[i];
-	            object['sex'] = 'male';
+	            object['score'] = CaringList[i];
+	            object['sex'] = globalFriendSex[globalFriendList[i]];
 	            object['radius'] = 0;
 	            object['theta'] = 0;
 	            
@@ -104,7 +133,7 @@ function Draw_Datagram( globalUserHead,
         }
                 	    
 	    // Draw the user in the center: globalUserName required!
-	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 36, '', 'center', 'none');
+	    DrawRenRenUser(ctx, globalUserHead, centerX, centerY, 36, globalUserName, 'center', 'none');
 	    
 	    // Draw others
 	    for (var i=0; i<whoCareAboutTAArray.length; i++) {
@@ -119,6 +148,7 @@ function Draw_Datagram( globalUserHead,
 	    }
 	}
 }
+
 
 function arraySorting(a, b) {
     if (a.score > b.score) {
@@ -171,7 +201,7 @@ function DrawRenRenUser(context, headurl, x, y, radius, name, sex, blur) {
         context.restore();
         context.beginPath();
         context.arc(x, y, radius, 0, 2*Math.PI, false);
-        context.lineWidth = 1.5;
+        context.lineWidth = 2;
         context.strokeStyle = blur;
         context.stroke();
     };

@@ -1,7 +1,7 @@
 var globalFriendList = new Array();
 var globalFriendName = new Array();
 var globalFriendHead = new Array();
-var globalFriendName = new Array();
+var globalFriendSex = new Array();
 var globalUserHead = '';
 var globalUserId = 0;
 var globalUserName = 0;
@@ -16,6 +16,7 @@ var globalOkWithAuthor = false;
 var globalOkWithFriendList = false;
 var globalOkWithFriendStatus = false;
 var globalOkWithFriendComment = false;
+var globalOkWithFriendSex = false;
 
 
 // 状态变量保证各步只运行一次
@@ -53,7 +54,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 			globalFriendHead = JSON.parse(localStorage['globalFriendHead_'+globalUserId.toString()]);
 			globalFriendList = JSON.parse(localStorage['globalFriendList_'+globalUserId.toString()]);
 			globalFriendName = JSON.parse(localStorage['globalFriendName_'+globalUserId.toString()]);
-			globalFriendSex = JSON.parse(localStorage['globalFriendNaSex_'+globalUserId.toString()]);
+			globalFriendSex = JSON.parse(localStorage['globalFriendSex_'+globalUserId.toString()]);
 			globalWhoCareAboutTA = JSON.parse(localStorage['globalWhoCareAboutTA_'+globalUserId.toString()]);
 			globalWhoTACareAbout = JSON.parse(localStorage['globalWhoTACareAbout_'+globalUserId.toString()]);
 			$('label#status').html('现在展示的是缓存数据，如果想要刷新，请按“重新生成”键');
@@ -83,11 +84,14 @@ function displayData(){
 	//localStorage['globalWhoCareAboutTA_'+globalUserId.toString()] = globalWhoCareAboutTA;
 	//localStorage['globalWhoTACareAbout_'+globalUserId.toString()] = globalWhoTACareAbout;
 	Draw_Datagram(  globalUserHead, 
+					globalUserName,
 					globalFriendHead,  
 					globalFriendList, 
 					globalFriendName,
+					globalFriendSex, 
 					globalWhoCareAboutTA, 
 					globalWhoTACareAbout);
+	$('#div_result').css('display', 'block');
 }
 
 // 重新抓取数据
@@ -123,7 +127,7 @@ function getNewData(){
 				// 分析， 得到 globalWhoCareAboutTA 和 globalWhoTACareAbout ， 与 globalFriendList 和 globalFriendName
 				Analysis();
 				// 保存分析结果为localStorage
-				var globalFriendHead = new Array(globalFriendList.length);
+				globalFriendHead = new Array(globalFriendList.length);
 				for (var i=0; i<globalFriendList.length; i++){
 					if (globalStatus[globalFriendList[i]]){
 						globalFriendHead[i] = globalStatus[globalFriendList[i]].headurl;
@@ -139,11 +143,22 @@ function getNewData(){
 				localStorage['globalWhoCareAboutTA_'+globalUserId.toString()] = JSON.stringify(globalWhoCareAboutTA);
 				localStorage['globalWhoTACareAbout_'+globalUserId.toString()] = JSON.stringify(globalWhoTACareAbout);
 				
-				localStorage['globalFriendSex_'+globalUserId.toString()] = JSON.stringify(globalFriendSex);
-				// 分析完毕
-				update_status('分析完毕。');					
-				// 画图
-				displayData();
+				// uids
+				uids = new Array();
+				for (var i=0; i<globalFriendList.length; i++){
+					if (globalWhoCareAboutTA[i] || globalWhoTACareAbout[i]){
+						uids.push(globalFriendList[i]);
+					}
+				}
+				getFriendSex(uids);
+				setTimeout(function(){
+					// save
+					localStorage['globalFriendSex_'+globalUserId.toString()] = JSON.stringify(globalFriendSex);
+					// 分析完毕
+					update_status('分析完毕。');					
+					// 画图
+					displayData();
+				}, 10000);
 			}
 		}, 2*1000);
 	}
@@ -158,9 +173,10 @@ function getFriendSex(uids){
 	});
 	
 	renren.authorize(function() {
-		var status_id  = globalStatus[owner_id].doingArray[index].id;
-		var status_name = globalStatus[owner_id].name;
-		update_status('开始获取好友"'+status_name+'"状态id为'+status_id+'的状态回复...');
+		access_token = renren.getAccessToken();
+		if (window.console) {
+			console.log(access_token); 
+		}
 		var params = {}
 		params['access_token'] = access_token;
 		params['call_id'] = new Date().valueOf();
@@ -193,6 +209,7 @@ function getFriendSex(uids){
 					globalFriendSex[data[i]['uid']] = 'female';
 				}
 			}
+			globalOkWithFriendSex = true;
 			update_status('成功获取好友性别列表。');
 		}, 'json');
 	});
