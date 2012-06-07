@@ -17,6 +17,20 @@ div {
 	margin: 2px;
 	padding: 3px;
 }
+#div_result {
+	font-size: 24px;
+}
+canvas {
+	border: 1px solid #CCC;
+}
+.outlet {
+	background-color: #E0E0E0;
+	padding: 10px;
+	margin-top: 20px;
+	margin-right: 100px;
+	margin-bottom: 20px;
+	margin-left: 100px;
+}
 </style>
 </head>
 
@@ -34,9 +48,13 @@ div {
             	<button id="refresh">重新生成</button>
             </div>
         	<div id="div_result" style="display:block">
-            	<p><canvas id="canvas_result1" width='640' height='640'></canvas></p>
-            	<p><canvas id="canvas_result2"></canvas></p>
+            	<hr>
+            	<p>最关心TA的人:<br><canvas id="canvas_result1" width='640' height='640'></canvas></p>
+            	<hr>
+                <p>TA最关心的人:<br><canvas id="canvas_result2"></canvas></p>
+            	<hr>
             	<p><canvas id="canvas_result3"></canvas></p>
+            	<hr>
             	<p><canvas id="canvas_result4"></canvas></p>
                 <div id="save_share">
                 </div>

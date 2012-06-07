@@ -60,6 +60,9 @@ function Draw_Subgram(globalUserHead,
 	    var length = CaringList.length;
 	    var maxValue = getMaximum(CaringList);
 	    var whoCareAboutTAArray = new Array();
+		
+		ctx.fillStyle="#FFFFFF";
+		ctx.fillRect(0,0,640,640);
         
 	    // First pass the data to build the data object
 	    for (var i=0, j=0; i<length; i++) {
