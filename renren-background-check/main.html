@@ -9,59 +9,43 @@
 <script language="javascript" src="kineticjs.js"></script>
 <script language="javascript" src="datagram.js"></script>
 <script language="javascript" src="main.js"></script>
+<script language="javascript" src="main.ui.js"></script>
 <title>人人网背景调查</title>
-<style type="text/css">
-div {
-	font-size: 12px;
-	text-align: center;
-	margin: 2px;
-	padding: 3px;
-}
-#div_result {
-	font-size: 24px;
-}
-canvas {
-	border: 1px solid #CCC;
-}
-.outlet {
-	background-color: #E0E0E0;
-	padding: 10px;
-	margin-top: 20px;
-	margin-right: 100px;
-	margin-bottom: 20px;
-	margin-left: 100px;
-}
-</style>
+<link href="main.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-	<div class="outlet">
-    	<div class="app">
-        	<div id="div_alert" style="display:none">
-            	<label>用人人账号授权应用方可继续</label>
+<div class="outlet">
+    <div class="display">
+        <div class="old" style="display:none">
+            <div id="div_alert" style="display:none">
+                <label>用人人账号授权应用方可继续</label>
                 <button id="author">点击到授权页面<button>
             </div>
-        	<div id="div_status" style="display:block">
-            	<label id="status"></label>
+            <div id="div_status" style="display:block">
+                <label id="status"></label>
             </div>
-        	<div id="div_refresh" style="display:none">
-            	<button id="refresh">重新生成</button>
+            <div id="div_refresh" style="display:none">
+                <button id="refresh">重新生成</button>
             </div>
-        	<div id="div_result" style="display:block">
-            	<hr>
-            	<p>最关心TA的人:<br><canvas id="canvas_result1" width='640' height='640'></canvas></p>
-            	<hr>
+            <div id="div_result" style="display:block">
+                <hr>
+                <p>最关心TA的人:<br><canvas id="canvas_result1" width='640' height='640'></canvas></p>
+                <hr>
                 <p>TA最关心的人:<br><canvas id="canvas_result2"></canvas></p>
-            	<hr>
-            	<p><canvas id="canvas_result3"></canvas></p>
-            	<hr>
-            	<p><canvas id="canvas_result4"></canvas></p>
+                <hr>
+                <p><canvas id="canvas_result3"></canvas></p>
+                <hr>
+                <p><canvas id="canvas_result4"></canvas></p>
                 <div id="save_share">
                 </div>
             </div>
         </div>
-        <div class="donate">
-        </div>
+        
+        
+        
+    </div>
+    <div class="friend_panel">
     </div>
 </div>
 </body>

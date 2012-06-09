@@ -1,0 +1,37 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	margin:0px;
+}
+
+#div_result {
+	font-size: 24px;
+}
+
+.outlet {
+	padding: 0px;
+	margin: 0px;
+}
+
+
+.display {
+	padding: 3px;
+	margin: 0px;
+	height:800px;
+	background-color:#F6F6F6;
+}
+.friend_panel {
+	float:right;
+	width:200px;
+	height:800px;
+	min-width:100px;
+	min-height:400px;
+	background-color:#E5E5E5;
+	border:solid 1px #D5D5D5;
+	margin-left:3px;
+	margin-right:0px;
+	position:fixed;
+	bottom:0;
+	right:0;
+}

@@ -36,43 +36,46 @@ var globalSignDoAnalysis = true;//是否对回复进行分析
 var globalWhoCareAboutTA = new Array();
 var globalWhoTACareAbout = new Array();
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-	if (request.agent && request.agent=="renren-background-check") {
-		uid = request.user;
-		globalUserId = uid;
-		console.log('get connneted, background check for '+uid);
-		sendResponse({agent:"renren-background-check", message:"main.html get uid="+uid});
-		globalUserId = uid;
-		getAuthor();
-		$('#author').click(function(){
+
+function old(){
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+		if (request.agent && request.agent=="renren-background-check") {
+			uid = request.user;
+			globalUserId = uid;
+			console.log('get connneted, background check for '+uid);
+			sendResponse({agent:"renren-background-check", message:"main.html get uid="+uid});
+			globalUserId = uid;
 			getAuthor();
-		});
-		if (localStorage['globalFriendList_'+globalUserId.toString()]){
-			// 曾经有数据， 展示数据
-			globalUserHead = JSON.parse(localStorage['UserHead_'+globalUserId.toString()]);
-			globalUserName = JSON.parse(localStorage['UserName_'+globalUserId.toString()]);
-			globalFriendHead = JSON.parse(localStorage['globalFriendHead_'+globalUserId.toString()]);
-			globalFriendList = JSON.parse(localStorage['globalFriendList_'+globalUserId.toString()]);
-			globalFriendName = JSON.parse(localStorage['globalFriendName_'+globalUserId.toString()]);
-			globalFriendSex = JSON.parse(localStorage['globalFriendSex_'+globalUserId.toString()]);
-			globalWhoCareAboutTA = JSON.parse(localStorage['globalWhoCareAboutTA_'+globalUserId.toString()]);
-			globalWhoTACareAbout = JSON.parse(localStorage['globalWhoTACareAbout_'+globalUserId.toString()]);
-			$('label#status').html('现在展示的是缓存数据，如果想要刷新，请按“重新生成”键');
-			$('#div_status').css('display', 'block');
-			$('#div_result').css('display', 'block');
-			$('#div_refresh').css('display', 'block');
-			displayData();
-			$('#refresh').click(function(){
-				$('#div_result').css('display', 'none');
-				$('#div_refresh').css('display', 'none');
-				getNewData();
+			$('#author').click(function(){
+				getAuthor();
 			});
-		} else {
-			// 没有数据，抓取数据
-			getNewData();
+			if (localStorage['globalFriendList_'+globalUserId.toString()]){
+				// 曾经有数据， 展示数据
+				globalUserHead = JSON.parse(localStorage['UserHead_'+globalUserId.toString()]);
+				globalUserName = JSON.parse(localStorage['UserName_'+globalUserId.toString()]);
+				globalFriendHead = JSON.parse(localStorage['globalFriendHead_'+globalUserId.toString()]);
+				globalFriendList = JSON.parse(localStorage['globalFriendList_'+globalUserId.toString()]);
+				globalFriendName = JSON.parse(localStorage['globalFriendName_'+globalUserId.toString()]);
+				globalFriendSex = JSON.parse(localStorage['globalFriendSex_'+globalUserId.toString()]);
+				globalWhoCareAboutTA = JSON.parse(localStorage['globalWhoCareAboutTA_'+globalUserId.toString()]);
+				globalWhoTACareAbout = JSON.parse(localStorage['globalWhoTACareAbout_'+globalUserId.toString()]);
+				$('label#status').html('现在展示的是缓存数据，如果想要刷新，请按“重新生成”键');
+				$('#div_status').css('display', 'block');
+				$('#div_result').css('display', 'block');
+				$('#div_refresh').css('display', 'block');
+				displayData();
+				$('#refresh').click(function(){
+					$('#div_result').css('display', 'none');
+					$('#div_refresh').css('display', 'none');
+					getNewData();
+				});
+			} else {
+				// 没有数据，抓取数据
+				getNewData();
+			}
 		}
-	}
-});
+	});
+}
 
 // 展示已有数据
 function displayData(){
