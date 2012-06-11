@@ -17,14 +17,36 @@ body {
 
 .display {
 	padding: 3px;
-	margin: 0px;
-	height:800px;
+	margin-left: 0px;
+	margin-right: 202px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	height:750px;
+	min-height:400px;
 	background-color:#F6F6F6;
 }
+
+.title {
+	text-align:center;
+	font-size:14px;
+	font-family:"黑体";
+	background-color:tranparent;
+	padding:10px;
+}
+
+div#friendlist{
+	text-align:center;
+}
+
+div#search_friend {
+	text-align:center;
+}
+
+
 .friend_panel {
 	float:right;
 	width:200px;
-	height:800px;
+	height:750px;
 	min-width:100px;
 	min-height:400px;
 	background-color:#E5E5E5;
@@ -34,4 +56,16 @@ body {
 	position:fixed;
 	bottom:0;
 	right:0;
+}
+
+.friend_panel #search_box {
+	border:solid 1px #D5D5D5;
+	background:url(img/ico.png) no-repeat;
+	background-position:8px -289px;
+	background-color:white;
+	border-radius: 12px;
+	color:#999;
+	height:24px;
+	line-height: 24px;
+	padding: 0px 5px 0px 26px;
 }
